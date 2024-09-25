@@ -7,11 +7,10 @@
         let
           lib = nixpkgs.lib;
           fs = lib.fileset;
+          isConfigFile = file: file.name == "package.yaml";
           configSource = fs.toSource {
             root = args.root;
-            fileset =
-              let filter = file: file.name == "package.yaml";
-              in fs.fileFilter filter args.root;
+            fileset = fs.fileFilter isConfigFile args.root;
           };
         in
         flake-utils.lib.eachSystem [ "x86_64-linux" ] (system:
@@ -31,7 +30,16 @@
           rec {
             packages = {
               default = packages."${packageName}";
-              "${packageName}" = pkgs.haskellPackages.callCabal2nix packageName args.root { };
+              "${packageName}" =
+                let
+                  src = fs.toSource {
+                    root = args.root;
+                    fileset = fs.fileFilter
+                      (file: isConfigFile file || file.hasExt "hs")
+                      args.root;
+                  };
+                in
+                pkgs.haskellPackages.callCabal2nix packageName src { };
             };
 
             apps =
