@@ -3,9 +3,11 @@
     "cradle": {
       "inputs": {
         "flake-utils": [
+          "garnix-haskell",
           "flake-utils"
         ],
         "nixpkgs": [
+          "garnix-haskell",
           "nixpkgs"
         ]
       },
@@ -41,6 +43,23 @@
         "type": "github"
       }
     },
+    "garnix-haskell": {
+      "inputs": {
+        "cradle": "cradle",
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 0,
+        "narHash": "sha256-xP7byeILUguiHRn3RwvjtC+CBzCHBygNck0C4XtryLU=",
+        "path": "../..",
+        "type": "path"
+      },
+      "original": {
+        "path": "../..",
+        "type": "path"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1750133334,
@@ -59,9 +78,7 @@
     },
     "root": {
       "inputs": {
-        "cradle": "cradle",
-        "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "garnix-haskell": "garnix-haskell"
       }
     },
     "systems": {

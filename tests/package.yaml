@@ -1,0 +1,9 @@
+name: runTests
+executables:
+  runTests:
+    main: RunTests.hs
+
+dependencies:
+  - base
+  - cradle
+  - hspec
