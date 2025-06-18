@@ -53,6 +53,7 @@ rec {
     pkgs.mkShell {
       packages = [
         pkgs.haskellPackages.hpack
+        (pkgs.haskell-language-server.override { dynamic = true; })
       ];
     };
 })
