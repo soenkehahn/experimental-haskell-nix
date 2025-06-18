@@ -38,12 +38,8 @@ in
         text = ''
           #!${pkgs.bash}/bin/bash
           set -euo pipefail
-          tmp=$(mktemp -d)
-          trap 'rm -rf "$tmp"' EXIT
-          cd "$tmp"
-          cp -r ${./..}/. .
-          chmod +rwX . -R
-          cd tests
+          export REPO_FILES=${./..}
+          cd ${./..}/tests
           runhaskell ./RunTests.hs;
         '';
       });
