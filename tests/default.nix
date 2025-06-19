@@ -40,7 +40,7 @@ in
           set -euo pipefail
           export REPO_FILES=${./..}
           cd ${./..}/tests
-          runhaskell ./RunTests.hs;
+          runhaskell ./RunTests.hs "$@"
         '';
       });
   };
