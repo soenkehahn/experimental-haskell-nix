@@ -36,6 +36,43 @@ main = hspec $ do
         output `shouldBe` "hello world"
 
       context "devShell" $ do
+        it "provides a working ghc and cabal" $ do
+          StdoutTrimmed output <-
+            run $
+              cmd "nix"
+                & addArgs
+                  [ "develop",
+                    "-L",
+                    "--override-input",
+                    "garnix-haskell",
+                    "path://" <> repoRoot,
+                    "-c",
+                    "ghc",
+                    "--version"
+                  ]
+                & setWorkingDir "./simple-hpack"
+          cs output `shouldContain` "Glorious Glasgow Haskell Compilation System, version"
+
+        it "provides a working hpack & cabal" $ do
+          run_ $
+            cmd "hpack"
+              & setWorkingDir "./simple-hpack"
+          StdoutTrimmed output <-
+            run $
+              cmd "nix"
+                & addArgs
+                  [ "develop",
+                    "-L",
+                    "--override-input",
+                    "garnix-haskell",
+                    "path://" <> repoRoot,
+                    "-c",
+                    "cabal",
+                    "run"
+                  ]
+                & setWorkingDir "./simple-hpack"
+          cs output `shouldContain` "hello world"
+
         it "provides a working LSP server" $ do
           StderrRaw output <-
             run $
@@ -53,3 +90,16 @@ main = hspec $ do
                   ]
                 & setWorkingDir "./simple-hpack"
           cs output `shouldContain` "1 file worked"
+
+    describe "multiple-executables" $ do
+      it "creates an app for every executable" $ do
+        StdoutTrimmed output <-
+          run $
+            cmd "nix"
+              & addArgs
+                [ "run",
+                  ".#apps." <> system <> ".foo",
+                  "-L",
+                  "--override-input",
+                  "garnix-haskell",
+                  "path://" <> repoRoot,
