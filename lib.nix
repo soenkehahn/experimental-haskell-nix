@@ -52,6 +52,7 @@ rec {
   devShells.default =
     pkgs.mkShell {
       packages = [
+        (pkgs.haskellPackages.ghc.withPackages (p: packages.default.buildInputs))
         pkgs.haskellPackages.ghc
         pkgs.haskellPackages.cabal-install
         pkgs.haskellPackages.hpack

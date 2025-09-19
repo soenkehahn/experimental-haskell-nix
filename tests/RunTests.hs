@@ -53,9 +53,13 @@ main = hspec $ do
                         <> command
                     )
                   & setWorkingDir "./simple-hpack"
-        it "provides a working ghc and cabal" $ do
+        it "provides a ghc" $ do
           StdoutTrimmed output <- runInDev ["ghc", "--version"]
           cs output `shouldContain` "Glorious Glasgow Haskell Compilation System, version"
+
+        it "provides the project's haskell dependencies" $ do
+          StdoutTrimmed output <- runInDev ["ghc-pkg", "list"]
+          cs output `shouldContain` "string-conversions"
 
         it "provides a working hpack & cabal" $ do
           () <- runInDev ["hpack"]
