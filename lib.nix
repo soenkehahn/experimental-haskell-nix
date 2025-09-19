@@ -52,6 +52,8 @@ rec {
   devShells.default =
     pkgs.mkShell {
       packages = [
+        pkgs.haskellPackages.ghc
+        pkgs.haskellPackages.cabal-install
         pkgs.haskellPackages.hpack
         (pkgs.haskell-language-server.override { dynamic = true; })
       ];

@@ -37,66 +37,31 @@ main = hspec $ do
         output `shouldBe` "hello world"
 
       context "devShell" $ do
+        let runInDev :: (Output o) => [String] -> IO o
+            runInDev command = do
+              run $
+                cmd "nix"
+                  & addArgs
+                    ( [ "develop",
+                        "-L",
+                        "--ignore-env",
+                        "--override-input",
+                        "garnix-haskell",
+                        "path://" <> repoRoot,
+                        "-c"
+                      ]
+                        <> command
+                    )
+                  & setWorkingDir "./simple-hpack"
         it "provides a working ghc and cabal" $ do
-          StdoutTrimmed output <-
-            run $
-              cmd "nix"
-                & addArgs
-                  [ "develop",
-                    "-L",
-                    "--override-input",
-                    "garnix-haskell",
-                    "path://" <> repoRoot,
-                    "-c",
-                    "ghc",
-                    "--version"
-                  ]
-                & setWorkingDir "./simple-hpack"
+          StdoutTrimmed output <- runInDev ["ghc", "--version"]
           cs output `shouldContain` "Glorious Glasgow Haskell Compilation System, version"
 
         it "provides a working hpack & cabal" $ do
-          run_ $
-            cmd "nix"
-              & addArgs
-                [ "develop",
-                  "-L",
-                  "--override-input",
-                  "garnix-haskell",
-                  "path://" <> repoRoot,
-                  "-c",
-                  "hpack"
-                ]
-              & setWorkingDir "./simple-hpack"
-          StdoutTrimmed output <-
-            run $
-              cmd "nix"
-                & addArgs
-                  [ "develop",
-                    "-L",
-                    "--override-input",
-                    "garnix-haskell",
-                    "path://" <> repoRoot,
-                    "-c",
-                    "cabal",
-                    "run"
-                  ]
-                & setWorkingDir "./simple-hpack"
+          () <- runInDev ["hpack"]
+          StdoutTrimmed output <- runInDev ["cabal", "run"]
           cs output `shouldContain` "hello world"
 
         it "provides a working LSP server" $ do
-          StderrRaw output <-
-            run $
-              cmd "nix"
-                & addArgs
-                  [ "develop",
-                    "-L",
-                    "--override-input",
-                    "garnix-haskell",
-                    "path://" <> repoRoot,
-                    "-c",
-                    "haskell-language-server-wrapper",
-                    "typecheck",
-                    "Main.hs"
-                  ]
-                & setWorkingDir "./simple-hpack"
+          StderrRaw output <- runInDev ["haskell-language-server-wrapper", "typecheck", "Main.hs"]
           cs output `shouldContain` "1 file worked"
